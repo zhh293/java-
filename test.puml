@@ -1,0 +1,21 @@
+<@startuml
+ ' 调整字体大小，让显示更清晰
+ skinparam defaultFontName "Microsoft YaHei"  ' 适配中文字体
+ skinparam defaultFontSize 14
+
+ ' 顶层核心组件
+ component "核心特色功能" as Core
+
+ ' 四个子功能组件（删除“PDF等文件分析”）
+ component "情绪日记管理\n用户可以记录日常情绪和事件" as MoodDiary
+ component "AI心理助手\n提供智能化心理支持和分析" as AIAssistant
+ component "人际关系分析\n通过AI分析用户的人际关系模式" as RelationshipAnalysis
+ component "情绪可视化\n自动生成情绪曲线和能量账户" as MoodVisualization
+
+ ' 核心功能与子功能的关联关系
+ Core --> MoodDiary
+ Core --> AIAssistant
+ Core --> RelationshipAnalysis
+ Core --> MoodVisualization
+
+ @enduml
