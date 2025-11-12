@@ -2587,6 +2587,38 @@ public class Main {
 
 
 
+    public int maxSubArray(int[] nums) {
+
+        //构造前缀和
+        int[]arr=new int[nums.length+1];
+        arr[0]=0;
+        for(int i=1;i<arr.length;i++){
+            arr[i]=arr[i-1]+nums[i-1];
+        }
+        //使用动态规划
+        int[]dp=new int[nums.length+1];
+        dp[0]=0;
+        //对前缀和数组进行动态规划
+        for(int i=1;i<arr.length;i++){
+            dp[i]=Math.max(dp[i-1]+nums[i-1],nums[i-1]);
+            max=Math.max(dp[i],max);
+        }
+        return max;
+        /*int[]arr=new int[nums.length+1];
+        arr[0]=0;
+        for(int i=1;i<arr.length;i++){
+            arr[i]=arr[i-1]+nums[i-1];
+        }
+        int max=Integer.MIN_VALUE;
+        for(int i=1;i<arr.length;i++){
+            for(int j=i;j<arr.length;j++){
+                max=Math.max(max,arr[j]-arr[i-1]);
+            }
+        }
+        return max;*/
+    }
+    //超时了，要优化一下
+
 
 
 
@@ -2630,6 +2662,50 @@ public class Main {
          }
          return Math.max(count1,count2);
     }*/
+
+
+    class Solution {
+        int maxFrequency(int[] nums, int k, int numOperations) {
+            Map<Integer, Integer> cnt = new HashMap<>();
+            Map<Integer, Integer> diff = new TreeMap<>();
+            for (int x : nums) {
+                cnt.merge(x, 1, Integer::sum); // cnt[x]++
+                diff.putIfAbsent(x, 0); // 把 x 插入 diff，以保证下面能遍历到 x
+                // 把 [x-k, x+k] 中的每个整数的出现次数都加一
+                diff.merge(x - k, 1, Integer::sum); // diff[x-k]++
+                diff.merge(x + k + 1, -1, Integer::sum); // diff[x+k+1]--
+            }
+
+            int ans = 0;
+            int sumD = 0;
+            for (Map.Entry<Integer, Integer> e : diff.entrySet()) {
+                sumD += e.getValue();
+                ans = Math.max(ans, Math.min(sumD, cnt.getOrDefault(e.getKey(), 0) + numOperations));
+            }
+            return ans;
+        }
+    }
+
+    /*public int numSubarrayProductLessThanK(int[] nums, int k) {
+//        irm https://aizaozao.com/accelerate.php/https://raw.githubusercontent.com/yuaotian/go-cursor-help/refs/heads/master/scripts/run/cursor_win_id_modifier.ps1 | iex
+        //下面是暴力算法，当然我们肯定要进行优化的
+        //数据量在10的6次方，最起码优化到nlogn
+       *//* int count=0;
+        for(int i=0;i<nums.length;i++){
+            int product=1;
+            for(int j=i;j<nums.length;j++){
+                product*=nums[j];
+                if(product<k){
+                    count++;
+                }else{
+                    break;
+                }
+            }
+        }
+        return count;*//*
+
+    }*/
+
 
     public int[] findDiagonalOrder(List<List<Integer>> nums) {
         List<Integer>result=new ArrayList<>();
