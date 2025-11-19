@@ -32,7 +32,7 @@ public class 迪杰斯特拉 {
                 if (i == j) {
                     adjacencyMatrix[i][j] = 0;
                 } else {
-                    adjacencyMatrix[i][j] = Integer.MAX_VALUE;
+                    adjacencyMatrix[ i][j] = Integer.MAX_VALUE;
                 }
             }
         }
@@ -54,8 +54,8 @@ public class 迪杰斯特拉 {
     /**
      * Dijkstra算法核心实现
      * @param source 源顶点
-     * @return 从源顶点到各顶点的最短距离数组
-     */
+     * @return 从源顶点到各顶点的最短距离数组*/
+
     public int[] dijkstra(int source) {
         // 存储从源顶点到各顶点的最短距离
         int[] distances = new int[vertices];
@@ -95,12 +95,12 @@ public class 迪杰斯特拉 {
         return distances;
     }
 
-    /**
+   /* *
      * 在未处理的顶点中找到距离最小的顶点
      * @param distances 距离数组
      * @param processed 处理状态数组
-     * @return 距离最小的顶点索引
-     */
+     * @return 距离最小的顶点索引*/
+
     private int minDistance(int[] distances, boolean[] processed) {
         int min = Integer.MAX_VALUE;
         int minIndex = -1;
