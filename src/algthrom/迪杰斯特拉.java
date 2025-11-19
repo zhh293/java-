@@ -75,6 +75,51 @@ public class 迪杰斯特拉 {
         }
     }
 
+
+
+
+
+
+
+    //完美，优先队列写迪杰斯特拉真的太好用了，不过要注意Java的优先队列没有decrease key操作，所以每次更新距离后都要重新插入队列
+    // 在dijkstra方法中使用优先队列的正确方式
+    /*public int[] dijkstra(int source) {
+        int[] distances = new int[vertices];
+        boolean[] processed = new boolean[vertices];
+        PriorityQueue<Vertex> pq = new PriorityQueue<>((a,b) -> a.distance - b.distance);
+
+        Arrays.fill(distances, Integer.MAX_VALUE);
+        distances[source] = 0;
+        pq.offer(new Vertex(source, 0));
+
+        while (!pq.isEmpty()) {
+            Vertex current = pq.poll();
+            int u = current.index;
+
+            if (processed[u]) continue;
+            processed[u] = true;
+
+            // 遍历邻接点进行松弛操作
+            for (int v = 0; v < vertices; v++) {
+                if (adjacencyMatrix[u][v] != Integer.MAX_VALUE && !processed[v]) {
+                    int newDist = distances[u] + adjacencyMatrix[u][v];
+                    if (newDist < distances[v]) {
+                        distances[v] = newDist;
+                        pq.offer(new Vertex(v, newDist));
+                    }
+                }
+            }
+        }
+        return distances;
+    }*/
+
+   /* class Vertex {
+        int index;
+        int distance;
+        // constructor...
+    }*/
+
+
     /**
      * Dijkstra算法核心实现
      * @param source 源顶点
