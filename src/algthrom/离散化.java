@@ -112,8 +112,7 @@ public class 离散化 {
 
 
 
-
-public class DiscretizationExample {
+ class DiscretizationExample {
     public static void main(String[] args) {
         // 示例1: 数值离散化
         int[] data = {1000000, 3000000, 1000000, 5000000, 2000000};

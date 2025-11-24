@@ -71,6 +71,7 @@ public class 迪杰斯特拉算法的说明和理解 {
             //找到距离原点最近的点
             int u = minDistance(distances, processed, source);
         }
+        return distances;
     }
 
     private int minDistance(int[] distances, boolean[] processed, int source) {
