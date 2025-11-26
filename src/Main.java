@@ -2738,6 +2738,55 @@ public class Main {
         }
         return result.stream().mapToInt(Integer::intValue).toArray();
     }
+    public int[] findOrder(int numCourses, int[][] prerequisites) {
+        //这个数组就是邻接矩阵罢了
+        //然后第一个参数是顶点的数量
+        //先统计每个顶点的入度
+        Map<Integer,List<int[]>>map=new HashMap<>();
+        int[]degree=new int[numCourses];
+        //一个集合装入度为零的顶点
+        List<Integer>list1=new ArrayList<>();
+        //让一个集合装结果
+        List<Integer>result=new ArrayList<>();
+        for(int i=0;i<prerequisites.length;i++){
+            degree[prerequisites[i][0]]++;
+            List<int[]>list=map.get(prerequisites[i][1]);
+            if(list==null){
+                list=new ArrayList<>();
+                list.add(prerequisites[i]);
+                map.put(prerequisites[i][1],list);
+            }else{
+                list.add(prerequisites[i]);
+                map.put(prerequisites[i][1],list);
+            }
+        }
+
+        for(int i=0;i<degree.length;i++){
+            if(degree[i]==0){
+                list1.add(i);
+            }
+        }
+
+        while(!list1.isEmpty()){
+            Integer result1= list1.remove(0);
+            result.add(result1);
+            //把与result1相连的点的入度全部减一
+            List<int[]>list=map.get(result1);
+            if(list==null) continue;
+            for(int i=0;i<list.size();i++){
+                int[]temp=list.get(i);
+                degree[temp[0]]--;
+                if(degree[temp[0]]==0){
+                    list1.add(temp[0]);
+                }
+            }
+        }
+
+        if(result.size()!=numCourses){
+            return new int[]{};
+        }
+        return  result.stream().mapToInt(Integer::intValue).toArray();
+    }
 
     public class TreeNode {
         int val;
