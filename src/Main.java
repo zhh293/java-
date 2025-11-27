@@ -2802,6 +2802,146 @@ public class Main {
     }
 
 
+   /* //这是第一版
+    public long maxSubarraySum(int[] nums, int k) {
+        // 1. 边界处理：覆盖所有无效场景
+        if (nums == null || nums.length == 0) {
+            return 0; // 数组为空，无有效子数组，返回0（可根据需求改为抛出异常）
+        }
+        if (k <= 0) {
+            throw new IllegalArgumentException("k 必须为正整数"); // k≤0无意义，抛出异常
+        }
+        int n = nums.length;
+        if (n < k) {
+            return 0; // 数组长度小于k，没有任何k的倍数长度子数组，返回0（可调整）
+        }
+        int max=Integer.MIN_VALUE;
+        for(int i=k;i<=nums.length;i+=k){
+            //运用滑动窗口遍历每个子数组的和并且筛选出最大值
+            int sum=0;
+            //先填充够一定数量的元素
+            for(int j=0;j<i;j++){
+                sum+=nums[j];
+            }
+            max=Math.max(max,sum);
+            for(int j=i;j<nums.length;j++){
+                sum=sum-nums[j-i]+nums[j];
+                max=Math.max(max,sum);
+            }
+        }
+        return max;
+    }*/
+
+    //第二版,虽然是o(n)但是数据量大的时候还是会溢出
+
+   /* public long maxSubarraySum(int[] nums, int k) {
+        // 1. 边界处理：覆盖所有无效场景
+        if (nums == null || nums.length == 0) {
+            return 0; // 数组为空，无有效子数组，返回0（可根据需求改为抛出异常）
+        }
+        if (k <= 0) {
+            throw new IllegalArgumentException("k 必须为正整数"); // k≤0无意义，抛出异常
+        }
+        int n = nums.length;
+        if (n < k) {
+            return 0; // 数组长度小于k，没有任何k的倍数长度子数组，返回0（可调整）
+        }
+        long max=Long.MIN_VALUE;
+        for(int i=k;i<=nums.length;i+=k){
+            //运用滑动窗口遍历每个子数组的和并且筛选出最大值
+            long sum=0;
+            //先填充够一定数量的元素
+            for(int j=0;j<i;j++){
+                sum+=nums[j];
+            }
+            max=Math.max(max,sum);
+            for(int j=i;j<nums.length;j++){
+                sum=sum-nums[j-i]+nums[j];
+                max=Math.max(max,sum);
+            }
+        }
+        return max;
+    }*/
+    //第三版，（每个目标长度都要从头遍历 i 个元素累加），用「前缀和数组」可以把这步从 O (i) 优化到 O (1)，整体时间复杂度大幅下降，且改动最小
+    //结果发现还是不行
+    /*public long maxSubarraySum(int[] nums, int k) {
+        // 1. 边界处理：覆盖所有无效场景
+        if (nums == null || nums.length == 0) {
+            return 0;
+        }
+        if (k <= 0) {
+            throw new IllegalArgumentException("k 必须为正整数");
+        }
+        int n = nums.length;
+        if (n < k) {
+            return 0;
+        }
+
+        // 改动1：提前计算前缀和数组（避免重复累加，核心优化）
+        long[] prefixSum = new long[n + 1];
+        for (int m = 0; m < n; m++) {
+            prefixSum[m + 1] = prefixSum[m] + nums[m];
+        }
+
+        long max = Long.MIN_VALUE;
+        for (int i = k; i <= nums.length; i += k) {
+            // 改动2：用前缀和直接取初始窗口和（替代原来的for循环累加）
+            long sum = prefixSum[i] - prefixSum[0];
+            max = Math.max(max, sum);
+            for (int j = i; j < nums.length; j++) {
+                // 原有滑动窗口逻辑不变（已经是O(1)更新）
+                sum = sum - nums[j - i] + nums[j];
+                max = Math.max(max, sum);
+            }
+        }
+        return max;
+    }*/
+
+    //第四版，最终版，按前缀和的「模 k 分组」+ 跟踪每组最小前缀和，一次遍历覆盖所有「k 的倍数长度」子数组，时间复杂度压到 O (n)（最优），空间复杂度 O (k)（可视为常数级，因 k 是输入参数）。
+    public long maxSubarraySum(int[] nums, int k) {
+        // 1. 边界处理（覆盖所有无效场景）
+        if (nums == null || nums.length == 0) {
+            return 0;
+        }
+        if (k <= 0) {
+            throw new IllegalArgumentException("k 必须为正整数");
+        }
+        int n = nums.length;
+        if (n < k) {
+            return 0; // 无 k 的倍数长度子数组
+        }
+
+        long maxSum = Long.MIN_VALUE;
+        long prefixSum = 0; // 滚动前缀和（无需存储整个前缀和数组，省空间）
+        // 存储每组的最小前缀和：group[r] 对应 (前缀和索引) mod k = r 的最小前缀和
+        long[] minPrefixSumGroup = new long[k];
+        // 初始化：前缀和索引 0（prefixSum=0）的 mod k 是 0，所以 group[0] = 0，其他组初始为无穷大
+        for (int r = 0; r < k; r++) {
+            minPrefixSumGroup[r] = Long.MAX_VALUE;
+        }
+        minPrefixSumGroup[0] = 0; // 关键：prefixSum[0] = 0 是所有分组的初始参考
+
+        // 2. 一次遍历数组，同时处理所有 k 的倍数长度子数组
+        for (int i = 0; i < n; i++) {
+            // 计算当前前缀和（prefixSum 对应 prefixSum[i+1]，即前 i+1 个元素的和）
+            prefixSum += nums[i];
+            // 当前前缀和的分组：r = (i+1) mod k（因为 prefixSum 对应索引 i+1）
+            int r = (i + 1) % k;
+
+            // 3. 计算当前分组的候选最大和：prefixSum - 该组最小前缀和（长度为 k 的倍数）
+            if (minPrefixSumGroup[r] != Long.MAX_VALUE) {
+                long currentSum = prefixSum - minPrefixSumGroup[r];
+                maxSum = Math.max(maxSum, currentSum);
+            }
+
+            // 4. 更新当前分组的最小前缀和（为后续元素提供参考）
+            minPrefixSumGroup[r] = Math.min(minPrefixSumGroup[r], prefixSum);
+        }
+
+        return maxSum;
+    }
+
+
     public List<String> removeAnagrams(String[] words) {
         Set<String>set=new HashSet<>();
         List<Integer>list1=new ArrayList<>();
