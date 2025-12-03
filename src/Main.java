@@ -2988,6 +2988,71 @@ public class Main {
 
     }
 
+
+    Integer min=Integer.MAX_VALUE;
+    public int coinChange(int[] coins, int amount) {
+        //从大到小排序
+        Integer[] coinsInteger = Arrays.stream(coins).boxed().toArray(Integer[]::new);
+        Arrays.sort(coinsInteger, Collections.reverseOrder());
+        backTrack(coins,0,amount,0L);
+        //从大到小排序
+
+        return min;
+    }
+    public void backTrack(int[]coins,int count,int amount,long current){
+        if(current>amount){
+            return;
+        }
+        if(count>min){
+            return;
+        }
+        if(current==amount){
+            min=Math.min(min,count);
+            return;
+        }
+
+
+        for(int i=0;i<coins.length;i++){
+            count++;
+            backTrack(coins,count,amount,current+coins[i]);
+            count--;
+        }
+    }
+
+    public int longestConsecutive(int[] nums) {
+        Map<Integer, Set<Integer>> map = new HashMap<>();
+        for (int num : nums) {
+            if (map.containsKey(num)) {
+                map.get(num).add(num);
+            } else {
+                Set<Integer> set = new HashSet<>();
+                set.add(num);
+                map.put(num, set);
+            }
+        }
+        int maxLength = 0;
+        for (int num : nums) {
+            if (map.containsKey(num - 1) || map.containsKey(num + 1)) {
+                int left = map.containsKey(num - 1) ? num - 1 : num;
+                int right = map.containsKey(num + 1) ? num + 1 : num;
+                int length = right - left + 1;
+                maxLength = Math.max(maxLength, length);
+            }
+        }
+        return maxLength;
+    }
+
+    public boolean isAnagram(String s, String t) {
+        char[]sArray=s.toCharArray();
+        char[]tArray=t.toCharArray();
+        Arrays.sort(sArray);
+        Arrays.sort(tArray);
+        if(Arrays.equals(sArray,tArray)){
+            return true;
+        }
+        return false;
+    }
+
     // 深度优先遍历检测环
     private boolean dfs(int course, Map<Integer, Set<Integer>> prereqMap, int[] visited) {
         // 如果正在访问，说明存在环
