@@ -40,4 +40,106 @@ public class Demo {
 
 
             */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   /*
+
+    在 Java 中，String 是一个非常核心且特殊的类，它有很多细节值得注意。下面我会从特性、内存机制、常用方法、性能优化等方面做一个全面总结。
+
+            1. 基本特性
+    不可变性（Immutable）
+    一旦创建 String 对象，其内容不可更改。任何修改操作（如拼接、替换）都会生成新的 String 对象。
+    final 类
+    String 被 final 修饰，不能被继承。
+    底层存储
+    JDK 9 之前：char[] 存储字符（UTF-16 编码）。
+    JDK 9 之后：byte[] + coder（紧凑字符串 Compact Strings，节省内存）。
+    线程安全
+    因为不可变性，String 是线程安全的。
+            2. 创建方式与内存机制
+2.1 字面量方式
+            Java
+
+    复制代码
+    String s1 = "Hello";
+    String s2 = "Hello"; // s1 == s2 为 true
+    字面量存储在 字符串常量池（String Pool） 中。
+    相同字面量只会在常量池中存一份，节省内存。
+            2.2 构造方法
+            Java
+
+    复制代码
+    String s3 = new String("Hello");
+    会在堆中创建一个新的对象，即使常量池中已有相同内容。
+    s3 == s1 为 false，但 s3.equals(s1) 为 true。
+            2.3 intern() 方法
+    Java
+
+            复制代码
+    String s4 = new String("Hello").intern();
+    intern() 会返回常量池中该字符串的引用，如果不存在则将其加入常量池。
+            3. 常用方法
+            Java
+
+    复制代码
+    String str = "Java Programming";
+str.length();           // 长度
+str.charAt(0);          // 获取字符
+str.substring(5);       // 截取
+str.indexOf("Pro");     // 查找
+str.equals("Java");     // 比较内容
+str.equalsIgnoreCase("java"); // 忽略大小写比较
+str.toUpperCase();      // 转大写
+str.trim();             // 去除首尾空格
+str.replace("Java", "C++"); // 替换
+    注意：这些方法不会修改原字符串，而是返回新对象。
+
+            4. 性能与优化
+    频繁修改字符串 → 使用 StringBuilder（单线程）或 StringBuffer（多线程）。
+    避免不必要的 new String()，优先使用字面量。
+    intern() 可减少重复字符串对象，但会增加常量池压力。
+            5. 内存与常量池细节
+    JDK 6 及之前：字符串常量池在 方法区（PermGen）。
+    JDK 7+：常量池移到 堆内存，减少 PermGen OOM 风险。
+    JDK 9+：引入紧凑字符串（Compact Strings），ASCII 字符用 LATIN1 存储，节省 50% 内存。
+            6. 示例：不可变性验证
+            Java
+
+    复制代码
+    public class StringTest {
+        public static void main(String[] args) {
+            String a = "Hello";
+            String b = a;
+            a = a + " World";
+            System.out.println(a); // Hello World
+            System.out.println(b); // Hello
+        }
+    }
+    输出结果表明，修改 a 并不会影响 b，因为 String 是不可变的。*/
 }

@@ -3043,7 +3043,97 @@ public class Main {
         return rotten==0?minutes:-1;
 
     }
+    //第一版，但是这样太局限了，所以我将推出第二版
+   /* public int countCoveredBuildings(int n, int[][] buildings) {
+        //用一个map集合存下来横坐标为键，纵坐标集合为值的东西，然后就能有O(n)的时间复杂度了
+        Map<Integer,Set<Integer>>map=new HashMap<>();
+        for(int i=0;i<buildings.length;i++){
+            int x = buildings[i][0];
+            int y = buildings[i][1];
+            // 若当前x未在map中，初始化空集合
+            if (!map.containsKey(x)) {
+                map.put(x, new HashSet<>());
+            }
+            // 将当前y添加到x对应的集合中
+            map.get(x).add(y);
+        }
+        int count=0;
+        for(int i=0;i<buildings.length;i++){
+            //看看当前这个数组上下左右是否都被包围了
+            int line=buildings[i][0];
+            int row=buildings[i][1];
+            Set<Integer> leftSet = map.get(line - 1);
+            Set<Integer> rightSet = map.get(line + 1);
+            Set<Integer> set = map.get(line);
+            if(set!=null&&leftSet!=null&&rightSet!=null&&leftSet.contains(row)&&rightSet.contains(row)&&set.contains(row+1)&&set.contains(row-1)){
+                count++;
+            }
+        }
+        return count;
+    }*/
 
+    public int countCoveredBuildings(int n, int[][] buildings) {
+        //用一个map集合存下来横坐标为键，纵坐标集合为值的东西，然后就能有O(n)的时间复杂度
+        // 新增2个极值Map（仅新增这两行，最小改动核心）
+        Map<Integer, int[]> xToYMinMax = new HashMap<>(); // key:x, value:[y最小值, y最大值]
+        Map<Integer, int[]> yToXMinMax = new HashMap<>(); // key:y, value:[x最小值, x最大值]
+        for (int i = 0; i < buildings.length; i++) {
+            int x = buildings[i][0];
+            int y = buildings[i][1];
+
+            // 新增：更新x对应的y极值（仅此处新增几行）
+            xToYMinMax.computeIfAbsent(x, k -> new int[]{y, y}); // 初始[min,max]都是y
+            int[] yMinMax = xToYMinMax.get(x);
+            yMinMax[0] = Math.min(yMinMax[0], y); // 更新最小值
+            yMinMax[1] = Math.max(yMinMax[1], y); // 更新最大值
+
+            // 新增：更新y对应的x极值（仅此处新增几行）
+            yToXMinMax.computeIfAbsent(y, k -> new int[]{x, x}); // 初始[min,max]都是x
+            int[] xMinMax = yToXMinMax.get(y);
+            xMinMax[0] = Math.min(xMinMax[0], x); // 更新最小值
+            xMinMax[1] = Math.max(xMinMax[1], x); // 更新最大值
+        }
+        int count = 0;
+        for (int i = 0; i < buildings.length; i++) {
+            int currX = buildings[i][0];
+            int currY = buildings[i][1];
+
+
+            // 优化判断逻辑（替换原stream遍历，改为O(1)极值对比，改动核心）
+            // 1. 判断上下：同一x的y最小值 < currY < 同一x的y最大值
+            int[] yMinMax = xToYMinMax.get(currX);
+            boolean hasUpDown = yMinMax[0] < currY && currY < yMinMax[1];
+
+            // 2. 判断左右：同一y的x最小值 < currX < 同一y的x最大值
+            int[] xMinMax = yToXMinMax.get(currY);
+            boolean hasLeftRight = xMinMax[0] < currX && currX < xMinMax[1];
+
+            if (hasUpDown && hasLeftRight) {
+                count++;
+            }
+        }
+        return count;
+    }
+    public List<String> removeSubfolders(String[] folder) {
+        List<String> ans = new ArrayList<>();
+
+        Arrays.sort(folder);
+        ans.add("/");
+        for (String f : folder) {
+            if (!f.startsWith(ans.getLast() + "/")) {
+                ans.add(f);
+            }
+        }
+        ans.removeFirst();
+
+        return ans;
+    }
+    public List<String> generateParenthesis(int n) {
+        int[]memo=new int[n*2];
+        Arrays.fill(memo,-1);
+        return DynamicPlanOne(n,memo);
+    }
+    public List<String> DynamicPlanOne(int n,int[]memo){}
     public int kthGrammar(int n, int k) {
         char num=DFS(n,k,"0",1);
         return num=='0'?0:1;
