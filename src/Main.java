@@ -3264,6 +3264,85 @@ public class Main {
         return freshOranges == 0 ? minutes : -1;
     }*/
 
+        public int minDeletionSize(String[] strs) {
+            int n = strs.length;
+            int m = strs[0].length();
+            String[] a = new String[n]; // 最终得到的字符串数组
+            Arrays.fill(a, "");
+
+            int ans = 0;
+            next:
+            for (int j = 0; j < m; j++) {
+                for (int i = 0; i < n - 1; i++) {
+                    if ((a[i] + strs[i].charAt(j)).compareTo(a[i + 1] + strs[i + 1].charAt(j)) > 0) {
+                        // j 列不是升序，必须删
+                        ans++;
+                        continue next;
+                    }
+                }
+                // j 列是升序，不删更好
+                for (int i = 0; i < n; i++) {
+                    a[i] += strs[i].charAt(j);
+                }
+            }
+            return ans;
+        }
+
+
+    public String decodeString(String s) {
+        Stack<Character> stack = new Stack<>();
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) != ']') {
+                stack.push(s.charAt(i));
+            } else {
+                // 遇到右括号，开始解码过程
+                StringBuilder chars = new StringBuilder();
+                // 提取括号内的字符
+                while (!stack.isEmpty() && stack.peek() != '[') {
+                    chars.append(stack.pop());
+                }
+
+                // 弹出左括号 '['
+                if (!stack.isEmpty()) {
+                    stack.pop();
+                }
+
+                // 提取重复次数
+                StringBuilder number = new StringBuilder();
+                while (!stack.isEmpty() && Character.isDigit(stack.peek())) {
+                    number.append(stack.pop());
+                }
+
+                // 数字是逆序的，需要反转
+                int repeatTimes = Integer.parseInt(number.reverse().toString());
+
+                // 反转字符顺序
+                String decodedString = chars.reverse().toString();
+
+                // 重复字符串并重新压入栈中
+                StringBuilder repeated = new StringBuilder();
+                for (int j = 0; j < repeatTimes; j++) {
+                    repeated.append(decodedString);
+                }
+
+                // 将解码后的字符串重新压入栈中
+                for (char c : repeated.toString().toCharArray()) {
+                    stack.push(c);
+                }
+            }
+        }
+
+        // 构建最终结果
+        for (char c : stack) {
+            sb.append(c);
+        }
+
+        return sb.toString();
+    }
+
+
 
     public int countCollisions(String directions) {
         int left = 0, right = directions.length() - 1;

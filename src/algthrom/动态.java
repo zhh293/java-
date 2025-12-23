@@ -63,4 +63,14 @@ public class 动态 {
         memo[x][y]=result1+result2;
         return result1+result2;
     }
+
+
+    public long maxTaxiEarnings(int n, int[][] rides) {
+        Arrays.sort(rides,(a,b)->a[0]-b[0]);
+        long[] dp=new long[n+1];
+        for(int i=0;i<rides.length;i++){
+
+        }
+
+    }
 }

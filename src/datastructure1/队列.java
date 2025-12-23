@@ -1,9 +1,6 @@
 package datastructure1;
 
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 
 public class 队列 {
     public int[] deckRevealedIncreasing(int[] deck) {
@@ -22,4 +19,34 @@ public class 队列 {
           }
           return arr;
     }
+
+    public List<String> wordSubsets(String[] words1, String[] words2) {
+        List<String>list=new ArrayList<>();
+        Map<Character,Integer>map1=new HashMap<>();
+        Map<Character,Integer>map2=new HashMap<>();
+        for(int i=0;i<words2.length;i++){
+            for(int j=0;j<words2[i].length();j++){
+                map2.put(words2[i].charAt(j),map2.getOrDefault(words2[i].charAt(j),0)+1);
+            }
+        }
+        for(int i=0;i<words1.length;i++){
+            for(int j=0;j<words1[i].length();j++){
+                map1.put(words1[i].charAt(j),map1.getOrDefault(words1[i].charAt(j),0)+1);
+            }
+            //看看map1中每个字符都出现而且map2中有对应的不少于map1中字符的个数
+            if(isValid(map1,map2)){
+                list.add(words1[i]);
+            }
+        }
+        return list;
+    }
+    public boolean isValid(Map<Character,Integer>map1,Map<Character,Integer>map2){
+        for(Character key:map2.keySet()){
+            if(!map1.containsKey(key)||map1.get(key)<map2.get(key)){
+                return false;
+            }
+        }
+        return true;
+    }
+
 }
