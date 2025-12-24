@@ -74,5 +74,42 @@ public class 广度优先遍历 {
         // 执行BFS遍历
         graph.bfs(1);
     }
+//    public List<List<Integer>> permute(int[] nums) {
+//        //写完这道题背八股
+//    }
+    public List<List<Integer>> zigzagLevelOrder(TreeNode root) {
+        List<List<Integer>>list=new ArrayList<>();
+
+        Deque<TreeNode>queue=new LinkedList<>();
+        queue.offer(root);
+        int count=0;
+        while(!queue.isEmpty()){
+
+            int size=queue.size();
+            List<Integer>list1=new ArrayList<>();
+            for(int i=0;i<size;i++){
+                TreeNode root1=queue.pop();
+                list1.add(root1.val);
+                if(root1.left!=null){
+                    queue.offer(root1.left);
+                }
+                if(root1.right!=null){
+                    queue.offer(root1.right);
+                }
+            }
+            if(count%2==1){
+                Collections.reverse(list1);
+            }
+            list.add(list1);
+            count++;
+        }
+        return list;
+    }
+    class TreeNode {
+        int val;
+        TreeNode left;
+        TreeNode right;
+        TreeNode(int x) { val = x; }
+    }
 }
 

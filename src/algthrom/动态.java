@@ -69,8 +69,15 @@ public class 动态 {
         Arrays.sort(rides,(a,b)->a[0]-b[0]);
         long[] dp=new long[n+1];
         for(int i=0;i<rides.length;i++){
-
+            int start=rides[i][0];
+            int end=rides[i][1];
+            int tip=rides[i][2];
+            long earn=(end-start)+tip;
+            dp[end]=Math.max(dp[end],dp[start]+earn);
+            for(int j=end+1;j<=n;j++){
+                dp[j]=Math.max(dp[j],dp[j-1]);
+            }
         }
-
+        return dp[n];
     }
 }
