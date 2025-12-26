@@ -1,5 +1,7 @@
 package datastructureclass;
 
+import java.util.PriorityQueue;
+
 public class stack1 {
     public int top;
     public char []stack;

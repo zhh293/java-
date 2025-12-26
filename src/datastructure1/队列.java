@@ -49,4 +49,31 @@ public class 队列 {
         return true;
     }
 
+    public void MergeLinkedList(ListNode l1, ListNode l2){
+        PriorityQueue<ListNode>pr=new PriorityQueue<>((a,b)->a.val-b.val);
+        ListNode pre=new ListNode();
+        ListNode cur=pre;
+        while(l1!=null){
+            pr.add(l1);
+            l1=l1.next;
+        }
+        while(l2!=null){
+            pr.add(l2);
+            l2=l2.next;
+        }
+        while(!pr.isEmpty()){
+            cur.next=pr.poll();
+            cur=cur.next;
+        }
+        cur.next=null;
+    }
+
+}
+
+class ListNode {
+    int val;
+    ListNode next;
+    ListNode() {}
+    ListNode(int val) { this.val = val; }
+    ListNode(int val, ListNode next) { this.val = val; this.next = next; }
 }

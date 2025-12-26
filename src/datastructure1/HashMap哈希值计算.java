@@ -148,3 +148,98 @@ public class HashMap哈希值计算 {
         System.out.println("hash(null) = " + hash(null)); // 输出0
     }
 }
+
+
+
+
+//jdk 1.7循环链表的产生
+
+
+
+/*
+循环链表的完整形成过程（以你说的 A->B 为例）
+假设初始状态：原数组某桶的链表是 A -> B（A 是头节点，B 是尾节点），此时线程 1 和线程 2 同时执行 put 操作，触发扩容：
+步骤 1：线程 1 执行 resize，先处理节点 A、B
+线程 1 开始迁移 A->B 到新数组，头插法的逻辑是：
+先取节点 A，插入新桶的头部 → 新桶：A
+再取节点 B，插入新桶的头部 → 新桶：B -> A（此时线程 1 可能因 CPU 时间片耗尽被挂起）。
+步骤 2：线程 2 抢占 CPU，继续处理同一个链表
+线程 2 看到的链表指针是被线程 1 改到一半的状态（B 的 next 指向 A，A 的 next 还是 B？不，这里是关键细节）：
+线程 2 从头遍历原链表（但此时指针已被线程 1 篡改），先处理节点 B：
+取出 B，将 B 的 next 指向新桶的「当前头节点」（此时新桶为空，B.next = null）。
+把 B 插入新桶头部 → 新桶：B。
+线程 2 继续处理节点 A：
+取出 A，此时 A 的 next 还是指向原链表的 B（未被线程 1 完全修改）。
+头插法：将 A 的 next 指向新桶的头节点 B → A.next = B。
+把 A 插入新桶头部 → 新桶：A -> B。
+此时线程 1 恢复执行，它之前处理到 B 的 next 指向 A，现在继续处理 A：
+线程 1 会把 A 的 next 指向「当前新桶的头节点 B」（而 B 的 next 已经被线程 2 改成 A）。
+步骤 3：循环链表形成
+最终新桶的链表变成：A -> B -> A（A 的 next 是 B，B 的 next 是 A），形成闭环。
+*/
+
+
+
+
+
+
+//HashSet
+
+/*
+一、核心结论：HashSet 是 HashMap 的「包装器」
+HashSet 本身没有独立的哈希实现逻辑，它完全基于 HashMap 实现 —— 可以把 HashSet 理解为「只使用 HashMap 的 key 部分，value 用一个固定常量占位」的特殊容器。
+先明确术语对应：
+        「哈希表」通常指 Java 中的 HashMap（哈希映射），是键值对（Key-Value） 结构；
+        「哈希 Set」即 HashSet（哈希集合），是无重复元素的无序集合，本质是借用 HashMap 的「key 唯一性」来实现集合的去重特性。
+二、HashSet 的底层实现细节（基于 JDK 8+）
+        1. 核心成员变量：依赖 HashMap 存储
+HashSet 源码中只定义了两个关键成员变量，全部围绕 HashMap：
+java
+        运行
+public class HashSet<E> extends AbstractSet<E> implements Set<E>, Cloneable, java.io.Serializable {
+    // 核心存储容器：HashSet 底层就是这个 HashMap
+    private transient HashMap<E, Object> map;
+
+    // 所有元素对应的固定 Value：因为 HashSet 只需要 key，value 用一个常量占位即可
+    private static final Object PRESENT = new Object();
+
+    // 空构造器：直接初始化内部的 HashMap
+    public HashSet() {
+        map = new HashMap<>();
+    }
+}
+map：HashSet 的所有元素，最终都作为 HashMap 的 key 存储；
+PRESENT：一个固定的空对象，作为 HashMap 的 value（所有元素共享这个值，节省内存）。
+        2. 核心方法：完全委托给 HashMap
+HashSet 的所有核心操作（添加、删除、查询），本质都是调用 HashMap 的对应方法，仅暴露「集合视角」的接口：
+HashSet 方法	底层调用的 HashMap 方法	逻辑说明
+add(E e)	map.put(e, PRESENT)	把元素 e 作为 HashMap 的 key，PRESENT 作为 value；
+若 key 已存在（元素重复），put 返回旧值，add 则返回 false；
+若 key 不存在，add 返回 true。
+contains(Object o)	map.containsKey(o)	判断元素 o 是否作为 HashMap 的 key 存在。
+remove(Object o)	map.remove(o)	删除 HashMap 中 key 为 o 的键值对，返回是否删除成功（即是否存在该元素）。
+size()	map.size()	返回 HashMap 中 key 的数量（即集合元素个数）。
+clear()	map.clear()	清空 HashMap，集合变为空。
+示例：add 方法源码
+java
+        运行
+public boolean add(E e) {
+    // 核心逻辑：调用 HashMap.put，利用 key 唯一性实现去重
+    return map.put(e, PRESENT) == null;
+}
+当元素首次添加：map.put 返回 null，add 返回 true（添加成功）；
+当元素重复添加：map.put 返回旧值（PRESENT），add 返回 false（添加失败，保证集合无重复）。
+        3. 迭代器 / 遍历：复用 HashMap 的 key 遍历
+HashSet 的 iterator() 方法直接返回 HashMap.keySet().iterator()，即遍历 HashMap 的所有 key—— 这就是 HashSet 遍历元素的本质：
+java
+        运行
+public Iterator<E> iterator() {
+    return map.keySet().iterator();
+}
+三、HashSet 特性：完全继承 HashMap 的特性
+因为底层是 HashMap，HashSet 的核心特性也和 HashMap 完全一致：
+无序性：元素存储顺序不保证和插入顺序一致（依赖 key 的哈希值映射到数组下标）；
+去重原理：依赖元素的 hashCode() 和 equals() 方法 ——HashMap 判断 key 重复的规则是：hashCode 相同且 equals 返回 true，因此 HashSet 去重也遵循这个规则；
+        null 值支持：允许存储一个 null 元素（因为 HashMap 允许 key 为 null）；
+线程不安全：和 HashMap 一样，多线程并发修改（如 add/remove）会导致数据异常（JDK 1.8 后不会出现循环链表，但可能丢失元素）；
+扩容机制：HashSet 本身没有扩容逻辑，完全依赖内部 HashMap 的扩容（容量 × 负载因子触发扩容，默认初始容量 16，负载因子 0.75）。*/
