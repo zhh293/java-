@@ -1,6 +1,7 @@
 package 数据结构复习;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
 
@@ -185,5 +186,89 @@ public class 一些不方便用c语言写的代码 {
                 adjustHeap(arr,0,i);
             }
         }
+    }
+    class 迪杰斯特拉{
+        class Node{
+            int vertex;
+            int distance;
+            public Node(int vertex, int distance) {
+                this.vertex = vertex;
+                this.distance = distance;
+            }
+        }
+        private int vertices;
+        private List<List<Node>>lists;
+        public 迪杰斯特拉(int vertices) {
+            this.vertices = vertices;
+            this.lists = new ArrayList<>();
+            for (int i = 0; i < vertices; i++) {
+                lists.add(new ArrayList<>());
+            }
+        }
+        public void addEdge(int from, int to, int weight) {
+            lists.get(from).add(new Node(to, weight));
+        }
+        //迪杰斯特拉算法思路
+        //创建一个距离数组，用于存储源点到其他点的最短距离
+        public void dijkstra(int source) {
+            int[] distance = new int[vertices];
+            for (int i = 0; i < vertices; i++) {
+                distance[i] = Integer.MAX_VALUE;
+            }
+            boolean[] visited = new boolean[vertices];
+            PriorityQueue<Node> queue = new PriorityQueue<>(new Comparator<Node>() {
+                @Override
+                public int compare(Node o1, Node o2) {
+                    return o1.distance - o2.distance;
+                }
+            });
+            queue.offer(new Node(source, 0));
+            distance[source] = 0;
+            while (!queue.isEmpty()) {
+                Node poll = queue.poll();
+                if(visited[poll.vertex]){
+                    continue;
+                }
+                visited[poll.vertex] = true;
+                for(Node node:lists.get(poll.vertex)){
+                    if(distance[node.vertex]>distance[poll.vertex]+node.distance&&!visited[node.vertex]){
+                        distance[node.vertex] = distance[poll.vertex]+node.distance;
+                        queue.offer(new Node(node.vertex,distance[node.vertex]));
+                    }
+                }
+            }
+        }
+    }
+    class 弗洛伊德{
+        class Node{
+            int vertex;
+            int distance;
+            public Node(int vertex, int distance) {
+                this.vertex = vertex;
+                this.distance = distance;
+            }
+        }
+        private int vertices;
+        private List<List<Node>> lists;
+        public 弗洛伊德(int vertices) {
+            this.vertices = vertices;
+            this.lists = new ArrayList<>();
+            for (int i = 0; i < vertices; i++) {
+                lists.add(new ArrayList<>());
+            }
+        }
+        public void addEdge(int from, int to, int weight) {
+            lists.get(from).add(new Node(to, weight));
+        }
+
+        public void floyd(){
+            int[][] distance = new int[vertices][vertices];
+            for (int i = 0; i < vertices; i++) {
+                for (int j = 0; j < vertices; j++) {
+                    distance[i][j] = Integer.MAX_VALUE;
+                }
+            }
+        }
+
     }
 }
