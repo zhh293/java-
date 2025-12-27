@@ -47,5 +47,3 @@ void CreateBiTree(Node*head){
     }
 }
 
-//二叉搜索树
-void
