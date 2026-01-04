@@ -70,6 +70,48 @@ public class 中缀转后缀 {
         return postfix.toString();
     }
 
+    public static int caculateMiddle(String expression) {
+        Stack<Integer>numStack=new Stack<>();
+        Stack<Character>operatorStack=new Stack<>();
+        for (int i = 0; i < expression.length(); i++) {
+            char c = expression.charAt(i);
+            if(Character.isDigit(c)){
+                numStack.push(c-'0');
+                continue;
+            }
+            if(c=='('){
+                operatorStack.push(c);
+                continue;
+            }
+            if(c=='+'||c=='-'||c=='*'||c=='/'){
+                while(!operatorStack.isEmpty()&&getPriority(c)<=getPriority(operatorStack.peek())){
+                    char pop = operatorStack.pop();
+                    int num1 = numStack.pop();
+                    int num2 = numStack.pop();
+                    numStack.push(calculate(num1,num2,pop));
+                }
+            }
+            if(c==')'){
+                while(!operatorStack.isEmpty()&&operatorStack.peek()!='('){
+                    char pop = operatorStack.pop();
+                    int num1 = numStack.pop();
+                    int num2 = numStack.pop();
+                    numStack.push(calculate(num1,num2,pop));
+                }
+            }
+        }
+        return numStack.pop()-'0';
+    }
+    public static int calculate(int num1,int num2,char op){
+        return switch (op) {
+            case '+' -> num1 + num2;
+            case '-' -> num1 - num2;
+            case '*' -> num1 * num2;
+            case '/' -> num1 / num2;
+            default -> 0;
+        };
+    }
+
     public static void main(String[] args) {
         // 测试示例
         String testExpression = "2*(3+5)+7/1-4";
