@@ -1,5 +1,9 @@
 package 并行流使用;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.RecursiveTask;
 
 public class ForkjoinDemo {
@@ -8,29 +12,106 @@ public class ForkjoinDemo {
     public static void main(String[] args) {
 
     }
-}
-class Task extends RecursiveTask<Integer> {
-    private int start;
-    private int end;
-    public Task(int start, int end) {
-        this.start = start;
-        this.end = end;
-    }
-    @Override
-    protected Integer compute() {
-        if (end - start <= 5) {
-            int sum = 0;
-            for (int i = start; i <= end; i++) {
-                sum += i;
+
+    List<Integer> syychronizedList = Collections.synchronizedList(new ArrayList<>());
+    List<Integer> dataList = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+
+    class ComputeTask extends RecursiveTask<Void> {
+        private int start;
+        private int end;
+        private List<Integer> dataList;
+
+        public ComputeTask(int start, int end, List<Integer> dataList) {
+            this.start = start;
+            this.end = end;
+            this.dataList = dataList;
+        }
+
+        @Override
+        protected Void compute() {
+            if (end - start <= 5) {
+                for (int i = start; i <= end; i++) {
+                    if (i % 2 == 0) syychronizedList.add(i);
+                }
+                return null;
+            } else {
+                int middle = (start + end) / 2;
+                ComputeTask left = new ComputeTask(start, middle, dataList);
+                ComputeTask right = new ComputeTask(middle + 1, end, dataList);
+                left.fork();
+                right.compute();
+                left.join();
+                return null;
             }
-            return sum;
-        } else {
-            int middle = (start + end) / 2;
-            Task left = new Task(start, middle);
-            Task right = new Task(middle + 1, end);
-            left.fork();
-            right.fork();
-            return left.join() + right.join();
+        }
+    }
+
+    public class OptimizedComputeTask extends RecursiveTask<List<Integer>> {
+        private int start;
+        private int end;
+        private List<Integer> dataList;
+
+        public OptimizedComputeTask(int start, int end, List<Integer> dataList) {
+            this.start = start;
+            this.dataList = dataList;
+            this.end = end;
+        }
+
+        @Override
+        protected List<Integer> compute() {
+            // 最小任务单元：直接收集偶数
+            if (end - start <= 5) {
+                List<Integer> subList = new ArrayList<>();
+                for (int i = start; i <= end; i++) {
+                    if (i % 2 == 0) {
+                        subList.add(i);
+                    }
+                }
+                return subList;
+            } else {
+                // 拆分任务
+                int middle = (start + end) / 2;
+                OptimizedComputeTask left = new OptimizedComputeTask(start, middle, dataList);
+                OptimizedComputeTask right = new OptimizedComputeTask(middle + 1, end, dataList);
+
+                // 经典优化：异步左任务，同步执行右任务
+                left.fork();
+                List<Integer> rightResult = right.compute();
+                List<Integer> leftResult = left.join();
+
+                // 合并结果（无锁开销，因为是线程内的局部列表）
+                rightResult.addAll(leftResult);
+                return rightResult;
+            }
+        }
+    }
+
+
+    class Task extends RecursiveTask<Integer> {
+        private int start;
+        private int end;
+
+        public Task(int start, int end) {
+            this.start = start;
+            this.end = end;
+        }
+
+        @Override
+        protected Integer compute() {
+            if (end - start <= 5) {
+                int sum = 0;
+                for (int i = start; i <= end; i++) {
+                    sum += i;
+                }
+                return sum;
+            } else {
+                int middle = (start + end) / 2;
+                Task left = new Task(start, middle);
+                Task right = new Task(middle + 1, end);
+                left.fork();
+                right.fork();
+                return left.join() + right.join();
+            }
         }
     }
 }
