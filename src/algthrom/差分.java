@@ -1,9 +1,29 @@
 package algthrom;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 public class 差分 {
     public static void main(String[] args) {
         int[]arr=new int[1001];
-
+        Map<Integer,Integer> map=new HashMap<>();
+        Map.Entry<Integer,Integer> entry;
+        for (Map.Entry<Integer,Integer> entry1:map.entrySet()){
+            entry=entry1;
+        }
+        Set<Integer> set = map.keySet();
+        for (Integer i:set){
+            System.out.println(i);
+            map.get(i);
+        }
+        Collection<Integer> values = map.values();
+        for (Integer i:values){
+            System.out.println(i);
+        }
+        map.forEach((k,v)->System.out.println(k+" "+v));
+        //三种遍历方式。。。。。。。没啥难度，哈哈哈哈
     }
     public boolean carPooling(int[][] trips, int capacity) {
         int[]arr=new int[1001];

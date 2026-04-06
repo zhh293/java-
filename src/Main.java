@@ -25,8 +25,109 @@ public class Main {
         }
         return max;
     }
+//    public int[][] merge(int[][] intervals) {
+//        PriorityQueue<int[]> queue=new PriorityQueue<>(new Comparator<int[]>() {
+//            @Override
+//            public int compare(int[] o1, int[] o2) {
+//                return o1[0]-o2[0];
+//            }
+//        });
+//        for(int i=0;i<intervals.length;i++){
+//            queue.add(intervals[i]);
+//        }
+//        List<int[]> list=new ArrayList<>();
+//        while(!queue.isEmpty()){
+//            int[] num=queue.poll();
+//            int[] num2=queue.poll();
+//            if(num!=null&&num2!=null){
+//                if(num[1]>=num2[0]){
+//                    int[] result=new int[2];
+//                    result[0]=Math.min(num[0],num2[0]);
+//                    result[1]=Math.max(num[1],num2[1]);
+//                    queue.add(result);
+//                }else{
+//                    list.add(num);
+//                    queue.add(num2);
+//                }
+//            }else{
+//                list.add(num);
+//            }
+//        }
+//        return list.toArray(new int[list.size()][]);
+//    }
+    public int longestConsecutive1(int[] nums) {
+        int max=0;
+        Set<Integer>set=new HashSet<>();
+        for(int i=0;i<nums.length;i++){
+            set.add(nums[i]);
+        }
+        for (Integer num:set){
+            if(set.contains(num+1)){
+                continue;
+            }
+            int left=num;
+            int count=1;
+            while (set.contains(left-1)){
+                left--;
+                count++;
+            }
+            max=Math.max(max,count);
+        }
+        
+        return max;
+    }
 
 
+//    public int[][] merge(int[][] intervals) {
+//        if(intervals.length==0) return new int[][]{};
+//        if(intervals.length==1) return intervals;
+//        //拿第二个数组最左边的数跟第一个数组的两个数比，如果在范围内就可以合并，右边选双方右边最大的
+//        //先按照每个数组的第一位元素大小排序
+//        PriorityQueue<int[]> queue=new PriorityQueue<>(new Comparator<int[]>() {
+//            @Override
+//            public int compare(int[] o1, int[] o2) {
+//                return o1[0]-o2[0];
+//            }
+//        });
+//        for (int i=0;i<intervals.length;i++){
+//            queue.add(intervals[i]);
+//        }
+//        List<int[]> list=new ArrayList<>();
+//        while(!queue.isEmpty()){
+//            int[] num=queue.poll();
+//            int[] num2=queue.poll();
+//            if(num[0]<=num2[0]&&num[1]>=num2[0]){
+//                int[] temp=new int[2];
+//                temp[0]=Math.min(num[0],num2[0]);
+//                temp[1]=Math.max(num[1],num2[1]);
+//                list.add(temp);
+//                queue.add(num2);
+//                System.out.println("这批合格");
+//            }else{
+//                System.out.println("这批不合格");
+//                list.add(num);
+//                queue.add(num2);
+//            }
+//        }
+//        return list.toArray(new int[list.size()][]);
+//    }
+
+
+    public void moveZeroes(int[] nums) {
+        int left=0;
+        int right=1;
+        while(left<nums.length&&right<nums.length&&left<right){
+            if(nums[left]==0&&nums[right]!=0){
+                int temp=nums[left];
+                nums[left]=nums[right];
+                nums[right]=temp;
+                left++;
+                right++;
+            }else if(nums[left]!=0){
+                left++;
+            }
+        }
+    }
     public int climbStairs(int n, int[] costs) {
         int[]dp=new int[n+1];
         //每个格子代表着跳上这个台阶的最小花费

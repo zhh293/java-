@@ -53,6 +53,29 @@ public class 广度优先遍历 {
             System.out.println();
         }
     }
+    public int maxDepth(TreeNode root) {
+        //可以使用广度优先搜索，树高即为最长路径上的节点数
+        if(root==null){
+            return 0;
+        }
+        Deque<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        int depth=0;
+        while(!queue.isEmpty()){
+            int size=queue.size();
+            for(int i=0;i<size;i++){
+                TreeNode node = queue.poll();
+                if(node.left!=null){
+                    queue.offer(node.left);
+                }
+                if(node.right!=null){
+                    queue.offer(node.right);
+                }
+            }
+            depth++;
+        }
+        return depth;
+    }
 
     public static void main(String[] args) {
         // 基于文件中提供的边数据创建图
